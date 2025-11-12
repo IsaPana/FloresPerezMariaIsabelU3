@@ -193,3 +193,25 @@ async function deleteTask(id) {
     responseMsg.textContent = " Error al eliminar tarea";
   }
 }
+// API externa: Consejo motivacional
+async function getMotivation() {
+  try {
+    const res = await fetch("https://api.adviceslip.com/advice");
+    const data = await res.json();
+    const original = data.slip.advice;
+
+    // Traducir usando API gratuita de MyMemory
+    const translateRes = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(original)}&langpair=en|es`
+    );
+    const translateData = await translateRes.json();
+    const translated = translateData.responseData.translatedText;
+
+    const msg = document.getElementById("motivation");
+    if (msg) msg.textContent = `💡 Consejo: "${translated}"`;
+  } catch {
+    console.log("No se pudo obtener el consejo motivacional.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", getMotivation);
