@@ -10,14 +10,13 @@ function updateForm() {
   if (isLogin) {
     title.textContent = "Inicia sesión";
     submitBtn.textContent = "Entrar";
-    toggleText.innerHTML = `¿No tienes cuenta? <a href="#" id="toggle-link">Regístrate aquí</a>`;
+    toggleText.innerHTML = '¿No tienes cuenta? <a href="#" id="toggle-link">Regístrate aquí</a>';
   } else {
     title.textContent = "Regístrate";
     submitBtn.textContent = "Crear cuenta";
-    toggleText.innerHTML = `¿Ya tienes cuenta? <a href="#" id="toggle-link">Inicia sesión</a>`;
+    toggleText.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggle-link">Inicia sesión</a>';
   }
 
-  //Volver a asignar el evento cada vez que se actualiza el HTML
   document.getElementById("toggle-link").addEventListener("click", (e) => {
     e.preventDefault();
     isLogin = !isLogin;
@@ -25,14 +24,18 @@ function updateForm() {
   });
 }
 
-// Inicializar formulario
 updateForm();
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!username || !password) {
+    responseMsg.textContent = "Por favor completa todos los campos ❗";
+    return;
+  }
 
   const endpoint = isLogin
     ? "http://localhost:5000/api/auth/login"
@@ -46,10 +49,13 @@ form.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-    responseMsg.textContent = data.message || "Operación exitosa ✅";
+    responseMsg.textContent = data.message || "Operación exitosa";
 
-
-  } catch (error) {
-    responseMsg.textContent = "Error al conectar con el servidor ❌";
+    if (isLogin && res.ok && data.token) {
+      localStorage.setItem("token", data.token);
+      setTimeout(() => (window.location.href = "tasks-pending.html"), 800);
+    }
+  } catch {
+    responseMsg.textContent = "Error al conectar con el servidor";
   }
 });

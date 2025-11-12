@@ -81,3 +81,71 @@ button:hover {
   font-size: 14px;
   color: #333;
 }
+.navbar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 10px 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.navbar h2 {
+  color: #4a2360;
+  font-weight: 800;
+}
+
+.navbar ul {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.navbar a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #4a2360;
+  transition: 0.3s;
+}
+
+.navbar a.active,
+.navbar a:hover {
+  color: #7a42d3;
+  text-decoration: underline;
+}
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.task-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.task-card:hover {
+  transform: translateY(-3px);
+}
+
+.task-card h3 {
+  margin: 0 0 10px;
+  color: #4a2360;
+}
+
+.task-card p {
+  margin: 5px 0;
+}
