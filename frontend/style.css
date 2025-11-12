@@ -122,30 +122,38 @@ button:hover {
   text-decoration: underline;
 }
 
-.task-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
+.tasks-wrapper {
+  margin-top: 120px;
+  text-align: center;
 }
 
 .task-card {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  width: 250px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+.task-card:hover { transform: translateY(-4px); }
+.done-btn {
+  background-color: #7b4397;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 8px; /* 💡 separa los botones */
 }
 
-.task-card:hover {
-  transform: translateY(-3px);
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
 }
 
-.task-card h3 {
-  margin: 0 0 10px;
-  color: #4a2360;
-}
-
-.task-card p {
-  margin: 5px 0;
-}

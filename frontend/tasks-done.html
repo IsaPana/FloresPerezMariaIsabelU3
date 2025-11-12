@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SecureTask | Finalizadas</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <nav class="navbar">
     <h2>SecureTask</h2>
     <ul>
-      <li><a href="add-task.html">Agregar tarea</a></li>
-      <li><a href="tasks-pending.html">Pendientes</a></li>
-      <li><a href="tasks-done.html" class="active">Finalizadas</a></li>
+      <li><a href="tasks-pending.html">Regresar</a></li>
       <li><a href="#" id="logout-btn">Cerrar sesión</a></li>
     </ul>
   </nav>
 
-  <div class="container">
-    <div class="form-container">
-      <h1>Tareas finalizadas</h1>
-      <div id="tasks-container" class="task-grid"></div>
-    </div>
+  <div class="tasks-wrapper">
+    <h1>Tareas finalizadas</h1>
+    <p id="response-msg"></p>
+    <div id="tasks-container" class="task-grid"></div>
   </div>
 
   <script src="tasks.js"></script>

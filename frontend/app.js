@@ -6,15 +6,18 @@ const submitBtn = document.getElementById("submit-btn");
 
 let isLogin = true;
 
+//  Alternar entre login y registro
 function updateForm() {
   if (isLogin) {
     title.textContent = "Inicia sesión";
     submitBtn.textContent = "Entrar";
-    toggleText.innerHTML = '¿No tienes cuenta? <a href="#" id="toggle-link">Regístrate aquí</a>';
+    toggleText.innerHTML =
+      '¿No tienes cuenta? <a href="#" id="toggle-link">Regístrate aquí</a>';
   } else {
     title.textContent = "Regístrate";
     submitBtn.textContent = "Crear cuenta";
-    toggleText.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggle-link">Inicia sesión</a>';
+    toggleText.innerHTML =
+      '¿Ya tienes cuenta? <a href="#" id="toggle-link">Inicia sesión</a>';
   }
 
   document.getElementById("toggle-link").addEventListener("click", (e) => {
@@ -26,6 +29,7 @@ function updateForm() {
 
 updateForm();
 
+// Manejo del formulario
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -49,13 +53,27 @@ form.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-    responseMsg.textContent = data.message || "Operación exitosa";
 
+    //  Mostrar respuesta
+    responseMsg.textContent = data.message || "Operación exitosa ";
+
+    //  Solo si es login exitoso
     if (isLogin && res.ok && data.token) {
+      // Guardar token correctamente
       localStorage.setItem("token", data.token);
-      setTimeout(() => (window.location.href = "tasks-pending.html"), 800);
+
+      // Confirmar que se guardó antes de redirigir
+      setTimeout(() => {
+        const checkToken = localStorage.getItem("token");
+        if (checkToken) {
+         window.location.href = "add-task.html";
+        } else {
+          responseMsg.textContent = "No se pudo guardar la sesión. Intenta de nuevo ";
+        }
+      }, 1200);
     }
-  } catch {
-    responseMsg.textContent = "Error al conectar con el servidor";
+  } catch (err) {
+    console.error(err);
+    responseMsg.textContent = "Error al conectar con el servidor ";
   }
 });

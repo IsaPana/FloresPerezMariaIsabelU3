@@ -4,7 +4,7 @@ import { Task } from "../models/Task.js";
 
 const router = express.Router();
 
-//Crear nueva tarea
+// Crear nueva tarea
 router.post("/", verifyToken, async (req, res) => {
   try {
     const { title, description, dueDate } = req.body;
@@ -13,49 +13,54 @@ router.post("/", verifyToken, async (req, res) => {
       description,
       dueDate,
       user: req.user.id,
+      completed: false, 
     });
 
     await newTask.save();
-    res.status(201).json({ message: "Tarea creada exitosamente ✅", task: newTask });
+    res.status(201).json({ message: "Tarea creada exitosamente ", task: newTask });
   } catch (error) {
-    res.status(500).json({ message: "Error al crear la tarea ❌", error: error.message });
+    res.status(500).json({ message: "Error al crear la tarea ", error: error.message });
   }
 });
 
-//Obtener todas las tareas del usuario
+// Obtener todas las tareas del usuario
 router.get("/", verifyToken, async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(tasks);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener las tareas ❌", error: error.message });
+    res.status(500).json({ message: "Error al obtener las tareas ", error: error.message });
   }
 });
 
-//Actualizar tarea
+// Actualizar tarea (corregido)
 router.put("/:id", verifyToken, async (req, res) => {
   try {
-    const { title, description, dueDate, status } = req.body;
+    const { title, description, dueDate, completed } = req.body;
+
+    //  Actualiza correctamente el campo 'completed'
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
-      { title, description, dueDate, status },
+      { title, description, dueDate, completed },
       { new: true }
     );
+
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
-    res.json({ message: "Tarea actualizada ✅", task });
+
+    res.json({ message: "Tarea actualizada ", task });
   } catch (error) {
-    res.status(500).json({ message: "Error al actualizar la tarea ❌", error: error.message });
+    res.status(500).json({ message: "Error al actualizar la tarea ", error: error.message });
   }
 });
 
-//Eliminar tarea
+// Eliminar tarea
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
     if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
-    res.json({ message: "Tarea eliminada ✅" });
+    res.json({ message: "Tarea eliminada " });
   } catch (error) {
-    res.status(500).json({ message: "Error al eliminar la tarea ❌", error: error.message });
+    res.status(500).json({ message: "Error al eliminar la tarea ", error: error.message });
   }
 });
 
