@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!token) return;
 
   const logoutBtn = document.getElementById("logout-btn");
-  const responseMsg = document.getElementById("response-msg");
   const path = window.location.pathname;
 
   if (path.includes("add-task")) {
@@ -54,7 +53,7 @@ async function addTask(e) {
   const responseMsg = document.getElementById("response-msg");
 
   if (!title) {
-    responseMsg.textContent = " Ingresa un título para la tarea.";
+    responseMsg.textContent = "Ingresa un título para la tarea.";
     return;
   }
 
@@ -69,18 +68,18 @@ async function addTask(e) {
     });
 
     if (res.ok) {
-      responseMsg.textContent = " Tarea añadida correctamente";
+      responseMsg.textContent = "Tarea añadida correctamente";
       e.target.reset();
       setTimeout(() => (window.location.href = "tasks-pending.html"), 900);
     } else {
-      responseMsg.textContent = " Error al agregar tarea";
+      responseMsg.textContent = "Error al agregar tarea";
     }
   } catch {
-    responseMsg.textContent = " Error al conectar con el servidor";
+    responseMsg.textContent = "Error al conectar con el servidor";
   }
 }
 
-// Obtener y mostrar tareas
+// Obtener tareas
 async function getTasks() {
   const responseMsg = document.getElementById("response-msg");
   try {
@@ -91,8 +90,8 @@ async function getTasks() {
 
     const path = window.location.pathname;
     const filtered = path.includes("pending")
-      ? tasks.filter((t) => !t.completed)
-      : tasks.filter((t) => t.completed);
+      ? tasks.filter((t) => t.status === "pendiente")
+      : tasks.filter((t) => t.status === "completada");
 
     renderTasks(filtered);
   } catch {
@@ -100,7 +99,7 @@ async function getTasks() {
   }
 }
 
-// Renderizar cards
+// Renderizar tareas
 function renderTasks(tasks) {
   const container = document.getElementById("tasks-container");
   container.innerHTML = "";
@@ -108,9 +107,7 @@ function renderTasks(tasks) {
 
   if (!tasks.length) {
     container.innerHTML = `<p>No hay tareas ${
-      window.location.pathname.includes("pending")
-        ? "pendientes"
-        : "finalizadas"
+      window.location.pathname.includes("pending") ? "pendientes" : "finalizadas"
     }.</p>`;
     return;
   }
@@ -124,27 +121,45 @@ function renderTasks(tasks) {
     const card = document.createElement("div");
     card.classList.add("task-card");
 
-    card.innerHTML = `
-      <h3>${task.title}</h3>
-      <p>${task.description || "Sin descripción"}</p>
-      <p><strong>Fecha límite:</strong> ${
-        task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "Sin fecha"
-      }</p>
-      <p><strong>Estado:</strong> ${
-        task.completed ? "Completada " : "Pendiente "
-      }</p>
-      ${
-        !task.completed
-          ? `<button class="done-btn" onclick="markAsDone('${task._id}')">Marcar como hecha</button>`
-          : ""
-      }
-      <button class="delete-btn" onclick="deleteTask('${task._id}')">Eliminar</button>
-    `;
+    const title = document.createElement("h3");
+    title.textContent = task.title;
+    card.appendChild(title);
+
+    const desc = document.createElement("p");
+    desc.textContent = task.description || "Sin descripción";
+    card.appendChild(desc);
+
+    const date = document.createElement("p");
+    date.innerHTML = `<strong>Fecha límite:</strong> ${
+      task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "Sin fecha"
+    }`;
+    card.appendChild(date);
+
+    const state = document.createElement("p");
+    state.innerHTML = `<strong>Estado:</strong> ${task.status}`;
+    card.appendChild(state);
+
+    // Botón "Marcar como hecha" solo si está pendiente
+    if (task.status === "pendiente") {
+      const doneBtn = document.createElement("button");
+      doneBtn.textContent = "Marcar como hecha";
+      doneBtn.classList.add("done-btn");
+      doneBtn.addEventListener("click", () => markAsDone(task._id));
+      card.appendChild(doneBtn);
+    }
+
+    // Botón eliminar
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Eliminar";
+    delBtn.classList.add("delete-btn");
+    delBtn.addEventListener("click", () => deleteTask(task._id));
+    card.appendChild(delBtn);
+
     container.appendChild(card);
   });
 }
 
-// Marcar como completada (corregido)
+// Marcar como completada (usa el campo "status")
 async function markAsDone(id) {
   const responseMsg = document.getElementById("response-msg");
   try {
@@ -154,19 +169,14 @@ async function markAsDone(id) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ completed: true }),
+      body: JSON.stringify({ status: "completada" }), // ✅ Aquí está el cambio clave
     });
 
-    const data = await res.json();
-
-    if (res.ok && data) {
-      responseMsg.textContent = " Tarea marcada como completada";
-      // Esperar confirmación del backend y redirigir
-      setTimeout(() => {
-        window.location.href = "tasks-done.html";
-      }, 1000);
+    if (res.ok) {
+      responseMsg.textContent = "Tarea marcada como completada";
+      setTimeout(() => (window.location.href = "tasks-done.html"), 1000);
     } else {
-      responseMsg.textContent = " No se pudo completar la tarea correctamente.";
+      responseMsg.textContent = "No se pudo completar la tarea correctamente.";
     }
   } catch (err) {
     console.error(err);
@@ -174,7 +184,7 @@ async function markAsDone(id) {
   }
 }
 
-//  Eliminar tarea
+// Eliminar tarea
 async function deleteTask(id) {
   const responseMsg = document.getElementById("response-msg");
   try {
@@ -184,43 +194,39 @@ async function deleteTask(id) {
     });
 
     if (res.ok) {
-      responseMsg.textContent = " Tarea eliminada correctamente";
+      responseMsg.textContent = "Tarea eliminada correctamente";
       setTimeout(getTasks, 600);
     } else {
-      responseMsg.textContent = " No se pudo eliminar la tarea";
+      responseMsg.textContent = "No se pudo eliminar la tarea";
     }
   } catch {
-    responseMsg.textContent = " Error al eliminar tarea";
+    responseMsg.textContent = "Error al eliminar tarea";
   }
 }
-// API externa: Consejo motivacionad
+
+// API externa: Consejo motivacional
 async function getMotivation() {
   const msg = document.getElementById("motivation");
-  if (!msg) return; // Si no hay contenedor, no hacer nada
-
-  msg.textContent = "💡 Cargando consejo motivacional...";
+  if (!msg) return;
+  msg.textContent = "Cargando consejo motivacional...";
 
   try {
-    // Primer API: obtener consejo en inglés
     const res = await fetch("https://api.adviceslip.com/advice");
     const data = await res.json();
     const original = data.slip.advice;
 
-    // Segundo API: traducir al español (API gratuita)
     const translateRes = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(original)}&langpair=en|es`
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+        original
+      )}&langpair=en|es`
     );
     const translateData = await translateRes.json();
     const translated = translateData.responseData.translatedText;
 
-    msg.textContent = `💡 Consejo: "${translated}"`;
-  } catch (error) {
-    console.error("Error al obtener consejo:", error);
-    msg.textContent = "💡 Consejo: “Sigue adelante, ¡vas muy bien!”";
+    msg.textContent = `Consejo: "${translated}"`;
+  } catch {
+    msg.textContent = "Consejo: Sigue adelante, ¡vas muy bien!";
   }
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  getMotivation();
-});
+document.addEventListener("DOMContentLoaded", getMotivation);
